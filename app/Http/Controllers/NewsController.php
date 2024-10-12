@@ -15,7 +15,7 @@ class NewsController extends Controller
      */
     public function index()
     {
-        $news = new NewsCollection(News::paginate(8));
+        $news = new NewsCollection(News::OrderByDesc('id')->paginate(8));
         return Inertia::render('Homepage', [
             'title' => 'INUMA NEWS',
             'description' => 'Selamat datang di INUMA NEWS',
@@ -50,7 +50,10 @@ class NewsController extends Controller
      */
     public function show(News $news)
     {
-        //
+        $myNews = $news::where('author', Auth::user()->email)->get();
+        return Inertia::render('Dashboard', [
+            'myNews' => $myNews,
+        ]);
     }
 
     /**

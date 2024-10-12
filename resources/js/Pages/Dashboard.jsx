@@ -1,7 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Inertia } from '@inertiajs/inertia';
 import { Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function Dashboard(props) {
     const [title, setTitle] = useState('');
@@ -20,7 +20,12 @@ export default function Dashboard(props) {
         setCategory('')
     }
 
-    console.log(props)
+    useEffect(() => {
+        if (!props.myNews) {
+            Inertia.get('/news')
+        }
+        return;
+    }, [])
 
     return (
         <AuthenticatedLayout
@@ -32,11 +37,10 @@ export default function Dashboard(props) {
         >
             <Head title="Dashboard" />
 
-            <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    <div className="p-6 text-gray-900">
+            <div className="py-12 m-3">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 ">
+                    <div className="p-6 text-gray-900 bg-base-100">
                         {isNotif && <div role="alert" className="alert alert-info">
-                            <div>
                             <svg xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -47,7 +51,6 @@ export default function Dashboard(props) {
                                     strokeWidth="2"
                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <span>{props.flash.message}</span>
-                            </div>
                         </div>
                         }
                         <input type="text" placeholder="Title" className="m-2 input input-bordered w-full" onChange={(title) => setTitle(title.target.value)} value={title} />
@@ -55,20 +58,28 @@ export default function Dashboard(props) {
                         <input type="text" placeholder="Category" className="m-2 input input-bordered w-full" onChange={(category) => setCategory(category.target.value)} value={category} />
                         <button className='btn btn-primary m-2' onClick={() => handleSubmit()}>SUBMIT</button>
                     </div>
-                    <div className='mx-auto max-w-7xl sm:px-6 lg:px-8'>
-                <div className="m-2 card w-full lg:w-96 bg-base-100 shadow-xl">
-                    <div className="card-body">
-                        <h2 className="card-title">
-                           title
-                            <div className="badge badge-secondary">NEW</div>
-                        </h2>
-                        <p>description</p>
-                        <div className="card-actions justify-end">
-                            <div className="badge badge-inline">category</div>
-                        </div>
-                    </div>
                 </div>
-                    </div>
+                <div className='p-4 mx-auto max-w-7xl sm:px-6 lg:px-8'>
+                    {props.myNews && props.myNews.length > 0 ? props.myNews.map((news, i) => {
+                        return (
+                            <div key={i} className="mt-6 card w-full lg:w-96 bg-base-100 shadow-xl">
+                                <div className="card-body">
+                                    <h2 className="card-title">
+                                        {news.title}
+                                        <div className="badge badge-secondary">NEW</div>
+                                    </h2>
+                                    <p>{news.description}</p>
+                                    <div className="card-actions justify-end">
+                                        <div className="badge badge-inline">{news.category}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }) : <p>Anda Belum Memiliki Berita</p>}
+
+                </div>
+                <div className='mx-auto max-w-7xl sm:px-6 lg:px-8'>
+
                 </div>
             </div>
         </AuthenticatedLayout>
